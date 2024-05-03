@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { PuffLoader } from "react-spinners";
 import { FaStar } from "react-icons/fa";
+import { SlCalender } from "react-icons/sl";
 import { UserData } from "../types/interfaces/UserData";
 
 //Internal Imports
@@ -13,7 +14,7 @@ export default function UserPage() {
 	const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<Error | null>(null);
-	const [username, setUsername] = useState<string>(
+	const [username] = useState<string>(
 		new URLSearchParams(window.location.search).get("username") as string
 	);
 
@@ -36,6 +37,7 @@ export default function UserPage() {
 
 		//Get the User from the API
 		const data = await findUser(username);
+		console.log(data);
 
 		//Check if the Data is a type of Error and save the Error in the State
 		if (data instanceof Error) setError(data);
@@ -133,10 +135,9 @@ export default function UserPage() {
 							{selectedUser?.organizations &&
 								selectedUser.organizations.map(organization => (
 									<div
+										key={organization.id}
 										className="bg-[#1F2937] rounded-lg p-4 flex items-center gap-3 hover:bg-[#1F2937]/80 cursor-pointer"
-										onClick={event =>
-											(window.location.href = `/user?username=${organization.login}`)
-										}
+										onClick={() => (window.location.href = `/user?username=${organization.login}`)}
 									>
 										{/*Setup the Current Organization's Image*/}
 										<img
@@ -171,8 +172,9 @@ export default function UserPage() {
 							{selectedUser?.repositories &&
 								selectedUser.repositories.map(repository => (
 									<div
-										className="bg-[#1F2937] rounded-lg p-4 flex flex-col gap-2 hover:bg-[#1F2937]/80 cursor-pointer"
-										onClick={event => (window.location.href = repository.html_url)}
+										key={repository.id}
+										className="bg-[#1F2937] rounded-lg p-4 flex flex-col justify-between gap-2 hover:bg-[#1F2937]/80 cursor-pointer"
+										onClick={() => (window.location.href = repository.html_url)}
 									>
 										{/*Setup the Current Repository's Name*/}
 										<div className="text-sm font-medium">{repository.name}</div>
@@ -180,10 +182,42 @@ export default function UserPage() {
 										{/*Setup the Current Repository's Description*/}
 										<div className="text-xs text-gray-400">{repository.description}</div>
 
-										{/*Setup the Current Repository's Start Count*/}
-										<div className="flex items-center gap-2 text-xs text-[#A78BFA]">
-											<FaStar className="h-4 w-4" />
-											<span>{repository.stargazers_count}</span>
+										{/*Setup the Commits Section*/}
+										<ul className="flex flex-col gap-2 text-xs text-[#A78BFA] h-full">
+											{/*Loop through the List of Commits*/}
+											{repository.commits &&
+												repository.commits.map(commit => (
+													<li key={commit.sha} className="flex flex-row gap-2">
+														{/*Setup the Current Commit's Author Image*/}
+														<img
+															src={commit.author?.avatar_url}
+															className="w-5 h-5 rounded-full"
+														></img>
+
+														{/*Setup the Current Commit's Sha String*/}
+														<p className="">{commit.sha.substring(0, 7)}</p>
+
+														{/*Setup the Current Commit's Message*/}
+														<p className="text-ellipsis overflow-hidden whitespace-nowrap">
+															{commit.commit.message}
+														</p>
+													</li>
+												))}
+										</ul>
+
+										{/*Setup the Current Repository's Footer Section*/}
+										<div className="flex flex-row justify-between mt-5">
+											{/*Setup the Current Repository's Start Count*/}
+											<div className="flex items-center gap-2 text-xs text-[#A78BFA]">
+												<FaStar className="h-4 w-4" />
+												<span>{repository.stargazers_count}</span>
+											</div>
+
+											{/*Setup the Current Repository's Date*/}
+											<div className="flex items-center gap-2 text-xs text-[#A78BFA]">
+												<SlCalender className="h-4 w-4" />
+												<span>{repository.updated_at}</span>
+											</div>
 										</div>
 									</div>
 								))}
