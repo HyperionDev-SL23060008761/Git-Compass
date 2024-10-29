@@ -18,6 +18,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
 
+      - name: Setup the Environment File
+        run: |
+          cp /home/portfolio/projects/git-compass/website/main.env /home/portfolio/projects/git-compass/website/server-files/.env
+
       - name: Install Required Modules
         run: |
           bun install
