@@ -49,7 +49,7 @@ Start the Project
 
 ### Viewing the site:
 
-Visit http://localhost:4005/ in your browser
+Visit http://localhost:4004/ in your browser
 
 ## Support
 
